@@ -1,0 +1,60 @@
+<html>
+ <body>
+
+  <pre id="edl-data-head"></pre>
+  <pre id="edl-data-gaze"></pre>
+
+  <script
+    src="https://code.jquery.com/jquery-3.3.1.min.js"
+    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+  <script src="./xlabs.js"></script>
+  <script type="text/javascript">
+
+  console.log( "Demo");
+
+  function storeData(roll, pitch)
+  {
+    $.ajax({
+      type: "POST",
+      url: '/store',
+      data: {'roll': roll, 'pitch': pitch},
+      dataType: 'application/json'
+    });
+  }
+  function sleep(milliseconds) {
+    // console.log("wait");
+    var start = new Date().getTime();
+    for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+  }
+
+  var Demo = {
+    update : function() {
+      var headroll = xLabs.getConfig( "state.head.roll" );
+      var headpitch = xLabs.getConfig( "state.head.pitch" );
+      console.log(JSON.stringify({ roll: headroll, pitch: headpitch }));
+      storeData(headroll, headpitch);
+      // sleep(100);
+    },
+
+    ready : function() {
+      xLabs.setConfig( "system.mode", "training" );
+      xLabs.setConfig( "browser.canvas.paintHeadPose", "0" );
+      window.addEventListener( "beforeunload", function() {
+          xLabs.setConfig( "system.mode", "off" );
+      });
+    }
+  };
+
+
+
+
+  xLabs.setup( Demo.ready, Demo.update, null, "b0708f99-1835-40b6-8855-6a4f688b5fb8" );
+
+  </script>
+ </body>
+</html>
